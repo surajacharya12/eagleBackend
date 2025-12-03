@@ -2,7 +2,9 @@
 const mongoose = require("mongoose");
 
 let cached = global.mongoose;
-if (!cached) cached = global.mongoose = { conn: null, promise: null };
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
 
 async function connectToDatabase(uri) {
   if (cached.conn) return cached.conn;
@@ -10,15 +12,15 @@ async function connectToDatabase(uri) {
   if (!cached.promise) {
     cached.promise = mongoose
       .connect(uri, {
-        bufferCommands: false,
         maxPoolSize: 10,
-        serverSelectionTimeoutMS: 3000, // Reduced from 5000ms to fail faster
+        serverSelectionTimeoutMS: 3000,
+        connectTimeoutMS: 3000,
         socketTimeoutMS: 45000,
-        connectTimeoutMS: 3000, // Added to prevent hanging connections
+        bufferCommands: false,
       })
-      .then((mongoose) => mongoose)
+      .then((mongooseInstance) => mongooseInstance)
       .catch((err) => {
-        cached.promise = null; // Reset promise on failure
+        cached.promise = null;
         throw err;
       });
   }

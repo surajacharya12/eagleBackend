@@ -1,3 +1,4 @@
+// connectDB.js
 const mongoose = require("mongoose");
 
 const connectDB = async (mongoURI) => {
@@ -12,7 +13,8 @@ const connectDB = async (mongoURI) => {
       socketTimeoutMS: 45000,
       bufferCommands: false,
     });
-    console.log("✅ MongoDB connected successfully");
+
+    console.log("✅ MongoDB connected");
   } catch (error) {
     console.error("❌ MongoDB connection error:", error.message);
   }
