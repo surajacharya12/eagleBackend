@@ -33,12 +33,25 @@ const connectDB = async () => {
 // Middleware to ensure DB connection
 app.use(async (req, res, next) => {
   try {
+    if (!process.env.MONGO_URL) {
+      return res.status(500).json({
+        success: false,
+        message:
+          "Database configuration error: MONGO_URL not set in environment variables",
+      });
+    }
     await connectDB();
     next();
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Database connection error" });
+    console.error("Database connection error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Database connection error",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Please check server logs",
+    });
   }
 });
 
