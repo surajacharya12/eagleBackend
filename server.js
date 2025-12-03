@@ -1,31 +1,31 @@
+// server.js
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectToDatabase = require("./utils/mongo");
 
+// Load environment variables
 dotenv.config();
 
 const app = express();
 
-//MIDDLEWARE
-
+// --- Middleware ---
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-//CONNECT TO MONGO (with connection caching for serverless)
+// --- MongoDB connection caching ---
 let isConnected = false;
 
 const connectDB = async () => {
-  if (isConnected) {
-    return;
-  }
+  if (isConnected) return;
   try {
+    if (!process.env.MONGO_URL) throw new Error("MONGO_URL not set");
     await connectToDatabase(process.env.MONGO_URL);
     isConnected = true;
     console.log("✅ MongoDB Connected");
   } catch (err) {
-    console.error("❌ MongoDB Connection Error:", err);
+    console.error("❌ MongoDB Connection Error:", err.message);
     throw err;
   }
 };
@@ -33,34 +33,21 @@ const connectDB = async () => {
 // Middleware to ensure DB connection
 app.use(async (req, res, next) => {
   try {
-    if (!process.env.MONGO_URL) {
-      return res.status(500).json({
-        success: false,
-        message:
-          "Database configuration error: MONGO_URL not set in environment variables",
-      });
-    }
     await connectDB();
     next();
   } catch (error) {
-    console.error("Database connection error:", error);
     res.status(500).json({
       success: false,
       message: "Database connection error",
-      error:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Please check server logs",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 });
 
-//ROUTES
-
+// --- Routes ---
 app.use("/founder", require("./route/founder"));
 
-//HOME ROUTE
-
+// --- Home route ---
 app.get("/", (req, res) => {
   res.json({
     success: true,
@@ -74,31 +61,18 @@ app.get("/", (req, res) => {
   });
 });
 
-//HEALTH CHECK ROUTE
-
+// --- Health check route ---
 app.get("/health", (req, res) => {
-  const hasMongoUrl = !!process.env.MONGO_URL;
-  const hasCloudinary = !!(
-    process.env.CLOUDINARY_CLOUD_NAME &&
-    process.env.CLOUDINARY_API_KEY &&
-    process.env.CLOUDINARY_API_SECRET
-  );
-
   res.json({
     success: true,
     status: "Server is running",
     environment: process.env.NODE_ENV || "development",
-    config: {
-      mongoConfigured: hasMongoUrl,
-      cloudinaryConfigured: hasCloudinary,
-      dbConnected: isConnected,
-    },
+    dbConnected: isConnected,
     timestamp: new Date().toISOString(),
   });
 });
 
-//ERROR HANDLING
-
+// --- Error handling ---
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
@@ -108,7 +82,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// For local development
+// --- Local development ---
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
@@ -116,5 +90,5 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
-// Export for Vercel
+// --- Export for Vercel ---
 module.exports = app;

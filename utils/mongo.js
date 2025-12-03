@@ -15,7 +15,11 @@ async function connectToDatabase(uri) {
         serverSelectionTimeoutMS: 5000,
         socketTimeoutMS: 45000,
       })
-      .then((mongoose) => mongoose);
+      .then((mongoose) => mongoose)
+      .catch((err) => {
+        cached.promise = null; // Reset promise on failure
+        throw err;
+      });
   }
 
   cached.conn = await cached.promise;
