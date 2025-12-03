@@ -12,8 +12,9 @@ async function connectToDatabase(uri) {
       .connect(uri, {
         bufferCommands: false,
         maxPoolSize: 10,
-        serverSelectionTimeoutMS: 5000,
+        serverSelectionTimeoutMS: 3000, // Reduced from 5000ms to fail faster
         socketTimeoutMS: 45000,
+        connectTimeoutMS: 3000, // Added to prevent hanging connections
       })
       .then((mongoose) => mongoose)
       .catch((err) => {
