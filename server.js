@@ -74,6 +74,29 @@ app.get("/", (req, res) => {
   });
 });
 
+//HEALTH CHECK ROUTE
+
+app.get("/health", (req, res) => {
+  const hasMongoUrl = !!process.env.MONGO_URL;
+  const hasCloudinary = !!(
+    process.env.CLOUDINARY_CLOUD_NAME &&
+    process.env.CLOUDINARY_API_KEY &&
+    process.env.CLOUDINARY_API_SECRET
+  );
+
+  res.json({
+    success: true,
+    status: "Server is running",
+    environment: process.env.NODE_ENV || "development",
+    config: {
+      mongoConfigured: hasMongoUrl,
+      cloudinaryConfigured: hasCloudinary,
+      dbConnected: isConnected,
+    },
+    timestamp: new Date().toISOString(),
+  });
+});
+
 //ERROR HANDLING
 
 app.use((err, req, res, next) => {
