@@ -1,32 +1,30 @@
 // utils/mongo.js
 const mongoose = require("mongoose");
 
-let cached = global.mongoose;
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
-}
+let isConnected = false;
 
 async function connectToDatabase(uri) {
-  if (cached.conn) return cached.conn;
+  if (!uri) throw new Error("MONGO_URL is missing!");
 
-  if (!cached.promise) {
-    cached.promise = mongoose
-      .connect(uri, {
-        maxPoolSize: 10,
-        serverSelectionTimeoutMS: 3000,
-        connectTimeoutMS: 3000,
-        socketTimeoutMS: 45000,
-        bufferCommands: false,
-      })
-      .then((mongooseInstance) => mongooseInstance)
-      .catch((err) => {
-        cached.promise = null;
-        throw err;
-      });
+  // Already connected? return.
+  if (isConnected) return mongoose.connection;
+
+  try {
+    const conn = await mongoose.connect(uri, {
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 4000,
+      connectTimeoutMS: 4000,
+      socketTimeoutMS: 45000,
+      bufferCommands: false,
+    });
+
+    isConnected = true;
+    console.log("✅ MongoDB connected");
+    return conn;
+  } catch (error) {
+    console.error("❌ MongoDB connection error:", error.message);
+    throw error;
   }
-
-  cached.conn = await cached.promise;
-  return cached.conn;
 }
 
 module.exports = connectToDatabase;

@@ -25,6 +25,18 @@ const createCloudinaryStorage = (folder) => {
   });
 };
 
+// Function to create storage for videos
+const createCloudinaryVideoStorage = (folder) => {
+  return new CloudinaryStorage({
+    cloudinary,
+    params: {
+      folder,
+      resource_type: "video",
+      allowed_formats: ["mp4", "mov", "avi", "mkv"],
+    },
+  });
+};
+
 // Multer uploader generator
 const uploadToCloudinary = (folder) =>
   multer({
@@ -32,7 +44,15 @@ const uploadToCloudinary = (folder) =>
     limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
   });
 
+// Multer uploader generator for videos
+const uploadVideoToCloudinary = (folder) =>
+  multer({
+    storage: createCloudinaryVideoStorage(folder),
+    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
+  });
+
 module.exports = {
   cloudinary,
   uploadToCloudinary,
+  uploadVideoToCloudinary,
 };
