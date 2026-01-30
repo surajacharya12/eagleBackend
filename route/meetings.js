@@ -68,8 +68,8 @@ const sendBookingEmail = async (booking, statusType) => {
 
                     <p>You can track the status or reschedule your meeting by visiting our tracking portal using your unique booking code.</p>
                     
-                    <a href="https://eagle-web-gamma.vercel.app/book-meeting/track/" class="button">Track My Booking</a>
-                    
+                    <a href="https://eagle-web-gamma.vercel.app/book-meeting/track" class="button">Track My Booking</a>
+
                 </div>
                 <div class="footer">
                     <p style="font-weight: 600; color: #475569; margin-bottom: 5px;">Eagle Infotech - Innovation & Technology Solutions</p>
