@@ -250,6 +250,12 @@ router.get("/bookings/code/:code", asyncHandler(async (req, res) => {
     res.json(booking);
 }));
 
+// User: Get all bookings by email
+router.get("/bookings/user/:email", asyncHandler(async (req, res) => {
+    const bookings = await Booking.find({ email: req.params.email }).populate("slotId").sort({ createdAt: -1 });
+    res.json(bookings);
+}));
+
 // Admin: Update booking status
 router.put("/bookings/:id/status", asyncHandler(async (req, res) => {
     const booking = await Booking.findById(req.params.id);
