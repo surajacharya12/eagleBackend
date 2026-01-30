@@ -23,10 +23,16 @@ const founderSchema = new mongoose.Schema({
   },
 
   // Social Media Links (LinkedIn, Twitter, Email)
-  socialMedia: {
-    linkedin: { type: String, default: "" },
-    twitter: { type: String, default: "" },
-    email: { type: String, default: "" },
+  // Social Media Links
+  socials: [
+    {
+      platform: { type: String, required: true },
+      url: { type: String, required: true },
+    },
+  ],
+  whatsapp: {
+    type: String,
+    trim: true,
   },
 
   // OPTIONAL: profile image

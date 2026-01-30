@@ -65,13 +65,15 @@ app.use("/team-department", teamDepartmentRouter);
 app.use("/reels", reelsRouter);
 app.use("/blogs", blogRouter);
 app.use("/comments", commentRouter);
+app.use("/contact", require("./route/contact"));
 
 // START SERVER
 if (require.main === module) {
   const PORT = process.env.PORT || 3001;
-  app.listen(PORT, () => {
+  app.listen(PORT, "0.0.0.0", () => {
     console.log(`🚀 Server running on port ${PORT}`);
   });
 }
 
 module.exports = app;
+// Force restart

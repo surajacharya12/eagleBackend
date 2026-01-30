@@ -29,15 +29,24 @@ router.post(
     });
   },
   asyncHandler(async (req, res) => {
-    const { name, position, quote, details, linkedin, twitter, email } =
-      req.body;
+    const { name, position, quote, details, whatsapp } = req.body;
+    let socials = req.body.socials;
+
+    if (typeof socials === "string") {
+      try {
+        socials = JSON.parse(socials);
+      } catch (e) {
+        socials = [];
+      }
+    }
 
     const newFounder = await Founder.create({
       name,
       position,
       quote,
       details,
-      socialMedia: { linkedin, twitter, email },
+      socials,
+      whatsapp,
       avatar: req.file ? req.file.path : "",
     });
 
@@ -81,15 +90,24 @@ router.put(
     });
   },
   asyncHandler(async (req, res) => {
-    const { name, position, quote, details, linkedin, twitter, email } =
-      req.body;
+    const { name, position, quote, details, whatsapp } = req.body;
+    let socials = req.body.socials;
+
+    if (typeof socials === "string") {
+      try {
+        socials = JSON.parse(socials);
+      } catch (e) {
+        socials = [];
+      }
+    }
 
     const updateData = {
       name,
       position,
       quote,
       details,
-      socialMedia: { linkedin, twitter, email },
+      socials,
+      whatsapp,
     };
 
     // If a new avatar is uploaded
