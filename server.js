@@ -28,25 +28,27 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
+app.use(async (req, res, next) => {
+  try {
+    await connectToDatabase(process.env.MONGO_URL);
+    next();
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Database connection error",
+      error: err.message
+    });
+  }
+});
+
 // Serve static files from uploads directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// CONNECT DB ONE TIME ONLY ON SERVER START
-connectToDatabase(process.env.MONGO_URL);
-
 // ROUTES
 app.get("/", (req, res) => {
-  const statusMap = {
-    0: "disconnected",
-    1: "connected",
-    2: "connecting",
-    3: "disconnecting",
-  };
-
   res.json({
     success: true,
-    message: "Server is running...",
-    db_status: statusMap[mongoose.connection.readyState],
+    message: "Server is running and Database is connected!",
   });
 });
 
@@ -65,6 +67,7 @@ app.use("/team-department", teamDepartmentRouter);
 app.use("/reels", reelsRouter);
 app.use("/blogs", blogRouter);
 app.use("/comments", commentRouter);
+
 // START SERVER
 if (require.main === module) {
   const PORT = process.env.PORT || 3001;
