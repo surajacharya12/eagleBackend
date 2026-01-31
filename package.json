@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "dev": "PORT=3001 nodemon server.js",
+    "start": "PORT=3001 node server.js"
+  },
   "dependencies": {
     "body-parser": "^2.2.1",
     "cloudinary": "^2.8.0",
